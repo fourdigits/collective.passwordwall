@@ -1,6 +1,7 @@
 """Initalize Passwordwall."""
 from AccessControl import getSecurityManager
 
+from .settings import COOKIE_NAME
 from .utils import get_password
 
 
@@ -35,14 +36,13 @@ def basicauth_validate(username_password_tuple):
 
 def reject_missing_password(portal, request):
     """Check for passwordwall cookie / basicauth creds."""
-    cookie_name = '__passwordwall'
     # Copied from rejectAnonymous
     if request['REQUEST_METHOD'] == 'OPTIONS':
         return
     # Don't ask again if already logged in
     if not is_anonymous_user():
         return
-    if request.cookies.get(cookie_name):
+    if request.cookies.get(COOKIE_NAME):
         return
     username_password_tuple = request._authUserPW()
     if not username_password_tuple:
@@ -52,7 +52,7 @@ def reject_missing_password(portal, request):
         show_basicauth_popup(request)
         return
     request.response.setCookie(
-        cookie_name,
+        COOKIE_NAME,
         'content doesnt matter',
         path='/',
     )
