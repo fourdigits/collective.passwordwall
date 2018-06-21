@@ -11,6 +11,19 @@ some people full testing access (also anonymous access), but without opening
 the site to the whole world.
 
 
+### Plain text
+
+The site password is stored internally as plain text. Do not use your personal
+super secure password here, because we intended it to be used by several
+people.
+
+The password should be easy to look up and communicate, which is why we store
+it in plain text.
+
+If you have a different use case for this product where you want a different
+behaviour: We *do* welcome pull requests!
+
+
 ## Alternatives
 
 You might also achieve this with:
