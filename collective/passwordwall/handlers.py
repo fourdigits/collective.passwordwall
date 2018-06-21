@@ -1,6 +1,8 @@
 """Initalize Passwordwall."""
 from AccessControl import getSecurityManager
 
+from .utils import get_password
+
 
 def is_anonymous_user():
     """Return False if user is logged in."""
@@ -27,7 +29,7 @@ def basicauth_validate(username_password_tuple):
     """Check that basic auth-supplied username + password is valid."""
     username, password = username_password_tuple
     # username doesn't matter
-    if password == 'henk':
+    if password == get_password():
         return True
 
 
@@ -48,6 +50,7 @@ def reject_missing_password(portal, request):
         return
     if not basicauth_validate(username_password_tuple):
         show_basicauth_popup(request)
+        return
     request.response.setCookie(
         cookie_name,
         'content doesnt matter',

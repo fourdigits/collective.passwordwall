@@ -34,12 +34,15 @@ How to use
 ----------
 
 Go to the Plone control panel, to the "Security" tab.
+
 You will see a checkbox "Site behind password". Check it to activate the passwordwall.
 This means users will need to supply credentials before they can use the site.
 
 Users that are already logged in as Plone users are not asked for credentials.
 
-Currently, the credentials are quite simple: Password should be "henk".
+The password can be set by the "Password" field.
+This is what people have to type in the "password" box in the dialog to get access.
+The "username" in the dialog is not used.
 
 
 Thank you
