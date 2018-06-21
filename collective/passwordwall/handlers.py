@@ -1,5 +1,10 @@
 """Initalize Passwordwall."""
+import hashlib
+
 from AccessControl import getSecurityManager
+
+from .settings import COOKIE_NAME
+from .utils import get_password
 
 
 def is_anonymous_user():
@@ -27,20 +32,43 @@ def basicauth_validate(username_password_tuple):
     """Check that basic auth-supplied username + password is valid."""
     username, password = username_password_tuple
     # username doesn't matter
-    if password == 'henk':
+    if password == get_password():
         return True
+
+
+def set_cookie(request):
+    """Set cookie name + value + path.
+
+    Value is an MD5 hash of the site password.
+    Cookie doesn't expire (yet).
+    """
+    password = get_password()
+    _hash = hashlib.md5(password).hexdigest()
+    request.response.setCookie(
+        COOKIE_NAME,
+        _hash,
+        path='/',
+    )
+
+
+def has_valid_cookie(request):
+    """Check if request has valid cookie."""
+    value = request.cookies.get(COOKIE_NAME)
+    password = get_password()
+    _hash = hashlib.md5(password).hexdigest()
+    return value == _hash
 
 
 def reject_missing_password(portal, request):
     """Check for passwordwall cookie / basicauth creds."""
-    cookie_name = '__passwordwall'
     # Copied from rejectAnonymous
     if request['REQUEST_METHOD'] == 'OPTIONS':
         return
     # Don't ask again if already logged in
     if not is_anonymous_user():
         return
-    if request.cookies.get(cookie_name):
+    # If user has a valid cookie, let them in
+    if has_valid_cookie(request):
         return
     username_password_tuple = request._authUserPW()
     if not username_password_tuple:
@@ -48,11 +76,9 @@ def reject_missing_password(portal, request):
         return
     if not basicauth_validate(username_password_tuple):
         show_basicauth_popup(request)
-    request.response.setCookie(
-        cookie_name,
-        'content doesnt matter',
-        path='/',
-    )
+        return
+    # Apparently the BasicAuth creds were valid, set cookie.
+    set_cookie(request)
 
 
 def insert_reject_missing_password_hook(portal, event):
