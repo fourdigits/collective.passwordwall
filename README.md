@@ -1,20 +1,17 @@
-Passwordwall
-============
+# Passwordwall
 
 This puts your Plone site behind a Basic Auth login,
 without actually logging in a Plone user.
 
 
-Use case
---------
+## Use case
 
 This is intended for use in acceptance environments, where you want give a
 some people full testing access (also anonymous access), but without opening
 the site to the whole world.
 
 
-Alternatives
-------------
+## Alternatives
 
 You might also achieve this with:
 - web server Basic Auth
@@ -24,14 +21,12 @@ But if your hosting setup is such that that isn't an option,
 this package might help.
 
 
-Related products
-----------------
+## Related products
 
 Use iw.rejectanonymous if you require users to log in anyway.
 
 
-How to use
-----------
+## How to use
 
 Go to the Plone control panel, to the "Security" tab.
 
@@ -45,8 +40,23 @@ This is what people have to type in the "password" box in the dialog to get acce
 The "username" in the dialog is not used.
 
 
-Thank you
----------
+### Picking a password
+
+It's recommended to not use dictionary words as is, nor should you use other
+well known phrases as passwords. This is because their MD5 hashes (which we
+store as the cookie value) would easily reveal the password. Just mixing in a
+couple of numbers or other characters should make for a fine password.
+Try it on https://isc.sans.edu/tools/reversehash.html if you're not sure.
+
+
+### Changing the password
+
+When you change the password, existing cookies will be invalid, because the
+password hash changed. People without Plone accounts (or who are logged out
+from Plone) will be forced to re-enter the credentials.
+
+
+## Thank you
 
 - Ingeniweb for iw.rejectanonymous, some of whose code this product copied.
   All spelling mistakes are also their fault.
