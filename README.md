@@ -1,7 +1,6 @@
 # Passwordwall
 
-This puts your Plone site behind a Basic Auth login,
-without actually logging in a Plone user.
+This puts your Plone site behind a login, without actually logging in a Plone user.
 
 
 ## Use case
@@ -50,7 +49,6 @@ Users that are already logged in as Plone users are not asked for credentials.
 
 The password can be set by the "Password" field.
 This is what people have to type in the "password" box in the dialog to get access.
-The "username" in the dialog is not used.
 
 
 ### Picking a password
