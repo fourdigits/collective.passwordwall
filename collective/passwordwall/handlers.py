@@ -13,6 +13,20 @@ def is_anonymous_user():
     return (u is None or u.getUserName() == 'Anonymous User')
 
 
+def setBody(self, *args, **kw):  # NOQA
+    """Do not set response body, overriding the ZServerHTTPResponse method.
+
+    The hook that redirects to the password from will set the 302 redirect
+    status, but after that the Publisher will still render it. Browsers will
+    not show this content, but you can still see it with curl/wget, and bots
+    will also find it.
+
+    To prevent the body from being set, we override this method from
+    ZServerHTTPResponse, so no body is set.
+    """
+    pass
+
+
 def start_auth_dialog(request):
     """Start authentication dialog: redirect to passwordwall login view."""
     pwwall_url = request.ACTUAL_URL.rstrip('/') + PASSWORDWALL_VIEW_NAME
@@ -20,6 +34,9 @@ def start_auth_dialog(request):
     # If user went to /news, we redirect there after login.
     came_from = request.ACTUAL_URL
     request.form = {'came_from': came_from}
+
+    # Override response's setBody method so no Plone content is shown.
+    request.response.setBody = setBody
 
     request.response.redirect(pwwall_url)
 
