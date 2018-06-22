@@ -5,7 +5,7 @@ version = '0.1a1'
 setup(name='collective.passwordwall',
       version=version,
       description="Passwordwall plugin",
-      long_description=open("README.rst").read(),
+      long_description=open("README.md").read(),
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
       classifiers=[
