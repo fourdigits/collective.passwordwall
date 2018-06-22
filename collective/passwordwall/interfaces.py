@@ -21,8 +21,7 @@ class IPasswordwallSchema(ISecuritySchema):
 
     password = TextLine(
         title=u'Site password',
-        description=u"Users must enter this password to view the site. "
-        u"(Username doesn't matter.)",
+        description=u"Users must enter this password to view the site. ",
         default=u'',
         required=False,
     )

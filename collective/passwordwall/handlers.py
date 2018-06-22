@@ -3,7 +3,7 @@ import hashlib
 
 from AccessControl import getSecurityManager
 
-from .settings import COOKIE_NAME
+from .settings import COOKIE_NAME, PASSWORDWALL_VIEW_NAME
 from .utils import get_password
 
 
@@ -13,42 +13,15 @@ def is_anonymous_user():
     return (u is None or u.getUserName() == 'Anonymous User')
 
 
-def show_basicauth_popup(request):
-    """Show basic auth popup."""
-    realm = request.response.realm
-    request.response.setStatus(401)
-    request.response.setHeader(
-        'WWW-Authenticate',
-        'basic realm="%s"' % realm, 1)
-    request.response.setBody("""
-<html><head><title>Login</title></head><body><p>
-    This site has been password-walled.
-    Your site user credentials are invalid here.
-    Contact your site administrator for credentials.
-</p></body></html>""")
+def start_auth_dialog(request):
+    """Start authentication dialog: redirect to passwordwall login view."""
+    pwwall_url = request.ACTUAL_URL.rstrip('/') + PASSWORDWALL_VIEW_NAME
 
+    # If user went to /news, we redirect there after login.
+    came_from = request.ACTUAL_URL
+    request.form = {'came_from': came_from}
 
-def basicauth_validate(username_password_tuple):
-    """Check that basic auth-supplied username + password is valid."""
-    username, password = username_password_tuple
-    # username doesn't matter
-    if password == get_password():
-        return True
-
-
-def set_cookie(request):
-    """Set cookie name + value + path.
-
-    Value is an MD5 hash of the site password.
-    Cookie doesn't expire (yet).
-    """
-    password = get_password()
-    _hash = hashlib.md5(password).hexdigest()
-    request.response.setCookie(
-        COOKIE_NAME,
-        _hash,
-        path='/',
-    )
+    request.response.redirect(pwwall_url)
 
 
 def has_valid_cookie(request):
@@ -60,25 +33,20 @@ def has_valid_cookie(request):
 
 
 def reject_missing_password(portal, request):
-    """Check for passwordwall cookie / basicauth creds."""
+    """Check for passwordwall cookie."""
     # Copied from rejectAnonymous
     if request['REQUEST_METHOD'] == 'OPTIONS':
         return
     # Don't ask again if already logged in
     if not is_anonymous_user():
         return
+    # If we're on the passwordwall page, continue
+    if request.ACTUAL_URL.rstrip('/').endswith(PASSWORDWALL_VIEW_NAME):
+        return
     # If user has a valid cookie, let them in
     if has_valid_cookie(request):
         return
-    username_password_tuple = request._authUserPW()
-    if not username_password_tuple:
-        show_basicauth_popup(request)
-        return
-    if not basicauth_validate(username_password_tuple):
-        show_basicauth_popup(request)
-        return
-    # Apparently the BasicAuth creds were valid, set cookie.
-    set_cookie(request)
+    start_auth_dialog(request)
 
 
 def insert_reject_missing_password_hook(portal, event):
