@@ -5,9 +5,16 @@ This puts your Plone site behind a login, without actually logging in a Plone us
 
 ## Use case
 
-This is intended for use in acceptance environments, where you want give a
-some people full testing access (also anonymous access), but without opening
-the site to the whole world.
+This is intended for use on public websites, so "Published" in Plone workflow
+terminology, where you want to restrict access because the site isn't meant to
+be open to the public yet.
+
+It enables people to view the site as as an anonymous user (in the Plone
+sense), so without having to log in into Plone.
+
+It is not intended for intranets, and other sites where login is required
+anyway. In that case, this product is either not necessary, or you're better
+off using iw.rejectanonymous.
 
 
 ### Plain text
@@ -31,11 +38,6 @@ You might also achieve this with:
 
 But if your hosting setup is such that that isn't an option,
 this package might help.
-
-
-## Related products
-
-Use iw.rejectanonymous if you require users to log in anyway.
 
 
 ## How to use
