@@ -1,10 +1,14 @@
 """Initalize Passwordwall."""
+from pprint import pprint
 import hashlib
+import logging
 
 from AccessControl import getSecurityManager
 
 from .settings import COOKIE_NAME, PASSWORDWALL_VIEW_NAME
 from .utils import get_password
+
+logger = logging.getLogger(__name__)
 
 
 def is_anonymous_user():
@@ -29,6 +33,7 @@ def setBody(self, *args, **kw):  # NOQA
 
 def start_auth_dialog(request):
     """Start authentication dialog: redirect to passwordwall login view."""
+    logger.info('start_auth_dialog')
     pwwall_url = request.ACTUAL_URL.rstrip('/') + PASSWORDWALL_VIEW_NAME
 
     # If user went to /news, we redirect there after login.
@@ -52,16 +57,22 @@ def has_valid_cookie(request):
 def reject_missing_password(portal, request):
     """Check for passwordwall cookie."""
     # Copied from rejectAnonymous
+    logger.info('reject_missing_password')
+    pprint(dict(request))
     if request['REQUEST_METHOD'] == 'OPTIONS':
+        logger.info('OPTIONS')
         return
     # Don't ask again if already logged in
     if not is_anonymous_user():
+        logger.info('NOT ANONYMOUS')
         return
     # If we're on the passwordwall page, continue
     if request.ACTUAL_URL.rstrip('/').endswith(PASSWORDWALL_VIEW_NAME):
+        logger.info('PASSWORDWALL VIEW')
         return
     # If user has a valid cookie, let them in
     if has_valid_cookie(request):
+        logger.info('NO COOKIE')
         return
     start_auth_dialog(request)
 
